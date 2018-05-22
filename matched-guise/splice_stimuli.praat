@@ -250,8 +250,7 @@ procedure concatenateSounds
 	Concatenate recoverably
 	select Sound chain
 	Rename: filePrefix$ + "i_spliced"
-	Play
-	pause OK?
+	@checkIfOkay
 	Write to WAV file... 'splicedDirectory$''filePrefix$''guiseB$'_spliced.wav
 
 	### Repeat to splice "e" into the original "i" guise
@@ -267,8 +266,28 @@ procedure concatenateSounds
 	Concatenate recoverably
 	select Sound chain
 	Rename: filePrefix$ + "e_spliced"
-	Play
-	pause OK?
+	@checkIfOkay
 	Write to WAV file... 'splicedDirectory$''filePrefix$''guiseA$'_spliced.wav
 endproc
 
+procedure checkIfOkay
+	Play
+	beginPause: "Sounds okay?"
+	clicked = endPause: "Yes", "Redo", "Replay", "Skip", 1
+	if clicked = 1
+		tempVar$ = "hi"
+	endif
+	if clicked = 2
+		### If it still sounds bad, do it again
+			sound$ = filePrefix$ + guiseA$
+			@selectInterval
+			sound$ = filePrefix$ + guiseB$
+			@selectInterval
+			@matchDuration
+			@concatenateSounds
+	endif
+	if clicked = 3
+		### Replay
+		@checkIfOkay
+	endif
+endproc
